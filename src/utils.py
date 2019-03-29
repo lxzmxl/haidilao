@@ -1,25 +1,22 @@
-import numpy as np
-import os
-import logging
 import pandas as pd
-import altgraph.Graph
+
 
 
 def read_txt(txt):
     """
-
+    read the text file
     """
     with open(txt, 'r') as f:
-        raw_total_list = f.readlines()
+        raw_total_list = f.readline()
         # total_list = []
         if 'cross.txt' in txt:
             column = ['id', 'roadID1', 'roadID2', 'roadID3', 'roadID4']
         else:
-            column = raw_total_list[0].strip('#').strip('\n').strip('(').strip(')').split(',')
+            column = raw_total_list.strip('#').strip('\n').strip('(').strip(')').split(',')
 
         df = pd.DataFrame(columns=column)
-        for each in raw_total_list[1:]:
-            each_list = each.strip('\n').strip('(').strip(')').split(',')
+        for line in f:
+            each_list = line.strip('\n').strip('(').strip(')').split(',')
             each_list = [int(i) for i in each_list]
             df.loc[len(df.index)] = each_list
             # total_list.append(each_list)

@@ -2,7 +2,8 @@ from utils import *
 from altgraph import Graph, GraphAlgo
 import logging
 import sys
-import pdb
+
+
 
 logging.basicConfig(level=logging.DEBUG,
                     filename='./logs/CodeCraft-2019.log',
@@ -16,6 +17,9 @@ def main():
         logging.info('please input args: car_path, road_path, cross_path, answerPath')
         exit(1)
 
+    # pool = Pool(processes=4)
+    # pool = mp.Pool(4)
+    # jobs = []
     car_path = sys.argv[1]
     road_path = sys.argv[2]
     cross_path = sys.argv[3]
@@ -36,13 +40,13 @@ def main():
     opts['road_txt_path'] = road_path
 
     car_df = read_txt(car_path)
-    cross_df = read_txt(cross_path)
+    # cross_df = read_txt(cross_path)
     road_df = read_txt(road_path)
 
     # pdb.set_trace()
-    car_df = car_df.sort_values(by=['speed', 'planTime'], ascending=False).sort_values(by=['planTime'])
-    car_df = car_df.reset_index(drop=True)
-    num = 15
+    # car_df = car_df.sort_values(by=['speed', 'planTime'], ascending=False).sort_values(by=['planTime'])
+    car_df = car_df.sort_values(by=['planTime']).reset_index(drop=True)
+    num = 10
 
     # edges = [(head , tail , weight) , ... ,]
     edges = []
@@ -50,11 +54,11 @@ def main():
         head = road_df.loc[i, 'from']
         tail = road_df.loc[i, 'to']
         # graph weight
-        time = road_df.loc[i, 'length'] / (road_df.loc[i, 'speed'] * road_df.loc[i, 'channel'])
-        edges.append((head, tail, time))
+        time_as_weight = road_df.loc[i, 'length'] / (road_df.loc[i, 'speed'] * road_df.loc[i, 'channel'])
+        edges.append((head, tail, time_as_weight))
 
         if road_df.loc[i, 'isDuplex'] == 1:
-            edges.append((tail, head, time))
+            edges.append((tail, head, time_as_weight))
     graph = Graph.Graph()
     for head, tail, weight in edges:
         graph.add_edge(head, tail, weight)
@@ -81,11 +85,8 @@ def main():
         for each_car in total_path:
             f.write('(')
             for each in each_car[:-1]:
-                f.write(str(each))
-                f.write(',')
-            f.write(str(each_car[-1]))
-            f.write(')')
-            f.write('\n')
+                f.write(str(each)+',')
+            f.write(str(each_car[-1])+')'+'\n')
 
 
 if __name__ == "__main__":
